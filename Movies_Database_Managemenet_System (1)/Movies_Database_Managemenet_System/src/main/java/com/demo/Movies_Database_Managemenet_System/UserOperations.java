@@ -1,11 +1,12 @@
 package com.demo.Movies_Database_Managemenet_System;
-
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 
 import java.util.List;
 import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class UserOperations implements OperationsInterface {
 
@@ -16,15 +17,34 @@ public class UserOperations implements OperationsInterface {
         try (Session session = factory.openSession()) {
             Transaction transaction = session.beginTransaction();
             scanner = new Scanner(System.in);
+
             // Create a new user object
             User newUser = new User();
             System.out.println("Enter User Name");
             newUser.setUserName(scanner.nextLine());
-            System.out.println("Enter Email");
-            newUser.setEmail(scanner.nextLine());
-            System.out.println("Enter Phone Number");
-            newUser.setPhoneNumber(scanner.nextLine());
-            
+
+            // Validate and set email
+            String email;
+            do {
+                System.out.println("Enter Email");
+                email = scanner.nextLine();
+                if (!isValidEmail(email)) {
+                    System.out.println("Invalid email format. Please enter a valid email address ending with @gmail.com.");
+                }
+            } while (!isValidEmail(email));
+            newUser.setEmail(email);
+
+            // Validate and set phone number
+            String phoneNumber;
+            do {
+                System.out.println("Enter Phone Number");
+                phoneNumber = scanner.nextLine();
+                if (!isValidPhoneNumber(phoneNumber)) {
+                    System.out.println("Invalid phone number format. Please enter a valid phone number.");
+                }
+            } while (!isValidPhoneNumber(phoneNumber));
+            newUser.setPhoneNumber(phoneNumber);
+
             // Save the new user
             session.save(newUser);
 
@@ -54,73 +74,29 @@ public class UserOperations implements OperationsInterface {
             transaction.commit();
         }
     }
-
-    @Override
-    public void update(SessionFactory factory) {
-    	try (Session session = factory.openSession()) {
-            Transaction transaction = session.beginTransaction();
-            scanner = new Scanner(System.in);
-            // Retrieve a user by ID
-            System.out.println("Enter id to update");
-            User user = session.get(User.class, scanner.nextInt()); // Assuming ID 2 for example
-
-            while (true) {
-                // Display menu options
-                System.out.println("Menu:");
-                System.out.println("1. User Name");
-                System.out.println("2. Email");
-                System.out.println("3. Phone Number");
-                System.out.println("4. Exit");
-                // Update user's information
-                // Read user choice
-                System.out.print("Enter your choice: ");
-                int choice = scanner.nextInt();
-
-                // Consume newline character
-                scanner.nextLine();
-
-                // Perform action based on user choice
-                switch (choice) {
-                    case 1:
-                        System.out.println("Enter new user name:");
-                        user.setUserName(scanner.nextLine());
-                        break;
-                    case 2:
-                        System.out.println("Enter new email:");
-                        user.setEmail(scanner.nextLine());
-                        break;
-                    case 3:
-                        System.out.println("Enter new phone number:");
-                        user.setPhoneNumber(scanner.nextLine());
-                        break;
-                    case 4:
-                        System.out.println("Exiting...");
-                        session.update(user);
-                        transaction.commit();
-                        System.out.println("User updated successfully!");
-                        return; // Exit the method
-                    default:
-                        System.out.println("Invalid choice. Please try again.");
-                }
-            }
-            // Save the updated user
-        } catch (Exception e) {
-            System.err.println("Error updating user: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
+    
+    
 
     @Override
     public void delete(SessionFactory factory) {
-    	try (Session session = factory.openSession()) {
+        try (Session session = factory.openSession()) {
             Transaction transaction = session.beginTransaction();
             scanner = new Scanner(System.in);
             // Retrieve a user by ID
             System.out.println("Enter id to delete");
-            User user = session.get(User.class, scanner.nextInt());
+            int userId = scanner.nextInt();
+            User user = session.get(User.class, userId);
 
             if (user != null) {
-                // Delete the user if found
+                // Delete associated login data first
+                Login login = session.createQuery("FROM Login WHERE userName = :userName", Login.class)
+                                    .setParameter("userName", user.getUserName())
+                                    .uniqueResult();
+                if (login != null) {
+                    session.delete(login);
+                }
+
+                // Then delete the user
                 session.delete(user);
                 transaction.commit();
                 System.out.println("User deleted successfully!");
@@ -131,6 +107,31 @@ public class UserOperations implements OperationsInterface {
             System.err.println("Error deleting user: " + e.getMessage());
             e.printStackTrace();
         }
+    }
+
     
+    
+    @Override
+    public void update(SessionFactory factory) {
+        // Implementation for update method
+    	
+    }
+
+   
+
+    // Email validation method
+    private static boolean isValidEmail(String email) {
+        String emailRegex = "^.+@gmail\\.com$"; // Ensures @gmail.com is at the end
+        Pattern pattern = Pattern.compile(emailRegex);
+        Matcher matcher = pattern.matcher(email);
+        return matcher.matches();
+    }
+
+    // Phone number validation method
+    private static boolean isValidPhoneNumber(String phoneNumber) {
+        String phoneRegex = "^(\\+\\d{1,3}[- ]?)?\\d{10}$"; // Simple phone number validation
+        Pattern pattern = Pattern.compile(phoneRegex);
+        Matcher matcher = pattern.matcher(phoneNumber);
+        return matcher.matches();
     }
 }
