@@ -45,67 +45,23 @@ public class LoginOperations implements OperationsInterface {
         }
     }
 
+	@Override
+	public void retrieveAll(SessionFactory factory) {
+		// TODO Auto-generated method stub
+		
+	}
 
+	@Override
+	public void update(SessionFactory factory) {
+		// TODO Auto-generated method stub
+		
+	}
 
-    @Override
-    public void retrieveAll(SessionFactory factory) {
-        try (Session session = factory.openSession()) {
-            Transaction transaction = session.beginTransaction();
+	@Override
+	public void delete(SessionFactory factory) {
+		// TODO Auto-generated method stub
+		
+	}
+   
 
-            // Retrieve all logins using HQL with a join fetch to include the user
-            List<Object[]> results = session.createQuery(
-                "SELECT l, l.user FROM Login l"
-            ).list();
-
-            // Display each login's information
-            for (Object[] result : results) {
-                Login login = (Login) result[0];
-                User user = (User) result[1];
-                System.out.println("Login ID: " + login.getLoginId() + ", Password: " + login.getPassword() + ", User Name: " + user.getUserName());
-            }
-
-            transaction.commit();
-        }
-    }
-
-
-
-
-    @Override
-    public void update(SessionFactory factory) {
-        try (Session session = factory.openSession()) {
-            Transaction transaction = session.beginTransaction();
-            scanner = new Scanner(System.in);
-            // Retrieve a login by ID
-            System.out.println("Enter id to update");
-            Login login = session.get(Login.class, scanner.nextInt()); // Assuming ID 2 for example
-            scanner.nextLine();
-            System.out.println("Enter new password:");
-            login.setPassword(scanner.next());
-                   
-            session.update(login);
-            transaction.commit();
-            System.out.println("Login updated successfully!");
-        }
-    }
-
-    @Override
-    public void delete(SessionFactory factory) {
-        try (Session session = factory.openSession()) {
-            Transaction transaction = session.beginTransaction();
-            scanner = new Scanner(System.in);
-            // Retrieve a login by ID
-            System.out.println("Enter id to delete");
-            Login login = session.get(Login.class, scanner.nextInt());
-
-            if (login != null) {
-                // Delete the login if found
-                session.delete(login);
-                transaction.commit();
-                System.out.println("Deleted successfully!");
-            } else {
-                System.out.println("Does not exist!");
-            }
-        }
-    }
 }
