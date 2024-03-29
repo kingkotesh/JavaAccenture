@@ -8,8 +8,6 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 
-
-
 public class App {
     private static Scanner scanner;
     private static String user1="sree";
@@ -20,9 +18,9 @@ public class App {
 		SessionFactory factory =null;
 		scanner = new Scanner(System.in);
 		while(true) {
-        	System.out.println("1. Create Account");
-            System.out.println("2. Login as Admin");
-            System.out.println("3. Login as User");
+        	System.out.println("1. Create User Account");
+            System.out.println("2. Admin Login");
+            System.out.println("3. User Login");
             System.out.println("4. Exit");
             System.out.print("Enter your choice: ");
             int choice = scanner.nextInt();
@@ -142,8 +140,8 @@ public class App {
 	            System.out.println("3. Movie");
 	            System.out.println("4. Actor");
 	            System.out.println("5. User");
-	            System.out.println("6. Login");
-	            System.out.println("7. Exit");
+	            //System.out.println("6. Login");
+	            System.out.println("6. Exit");
 	            System.out.print("Enter your choice: ");
 	            int choice = scanner.nextInt();
 
@@ -165,9 +163,6 @@ public class App {
 	                	factory=user();
 	                    break;
 	                case 6:
-	                	factory=login();
-	                    break;
-	                case 7:
 	                    System.out.println("Exited");
 	                    return factory; // Exit the main method
 	                default:
@@ -190,50 +185,7 @@ public class App {
 		op1.insert(factory);
 		return factory;
 	}
-	private static SessionFactory login() {
-		// Infinite loop for menu-driven CRUD operations
-		SessionFactory factory = HibernateUtil.getSessionFactory();
-		LoginOperations op = new LoginOperations();
-        // Create a Scanner object to read user input
-        scanner = new Scanner(System.in);
-        while (true) {
-            // Display menu options
-            System.out.println("Menu:");
-            System.out.println("1. Retrieve Logins");
-            System.out.println("2. Update Logins");
-            System.out.println("3. Delete Logins");
-            System.out.println("4. Insert Logins");
-            System.out.println("5. Exit");
 
-            // Read user choice
-            System.out.print("Enter your choice: ");
-            int choice = scanner.nextInt();
-
-            // Perform action based on user choice
-            switch (choice) {
-                case 1:
-                    op.retrieveAll(factory);
-                    break;
-                case 2:
-                    op.update(factory);
-                    break;
-                case 3:
-                    op.delete(factory);
-                    break;
-                case 4:
-                    op.insert(factory);
-                    break;
-                case 5:
-                    System.out.println("Exiting...");
-                    // Close resources
-                    //factory.close();
-                    return factory; // Exit the main method
-                default:
-                    System.out.println("Invalid choice. Please try again.");
-            }
-        
-        }
-	}
 	private static SessionFactory user() {
 		// Infinite loop for menu-driven CRUD operations
 		SessionFactory factory = HibernateUtil.getSessionFactory();
@@ -455,4 +407,3 @@ public class App {
         }
 	}
 }
-
